@@ -23,7 +23,7 @@ class TransactionController(GenericController):
     def next_with_transaction_sampler(self):
         # Check if transaction is done
         if self.transaction_sampler and self.transaction_sampler.done:
-            logger.debug(f'线程:[ {self.ctx.thread_name} ] 控制器:[ {self.name} ] 获取下一个取样器')
+            logger.debug(f'线程:[ {self.ctx.thread_name} ] 控制器:[ {self.name} ] 获取下一个请求')
             # This transaction is done
             self.transaction_sampler = None
             logger.debug(f'线程:[ {self.ctx.thread_name} ] 事务:[ {self.name} ] 事务结束')
@@ -49,7 +49,7 @@ class TransactionController(GenericController):
         """@override"""
         logger.debug(f'线程:[ {self.ctx.thread_name} ] 控制器:[ {self.name} ] 下一个为控制器')
         sampler = controller.next()
-        # 子代控制器的下一个取样器为空时重新获取父控制器的下一个取样器
+        # 子代控制器的下一个请求为空时重新获取父控制器的下一个请求
         if sampler is None:
             self.current_returned_none(controller)
             # We need to call the super.next, instead of this.next, which is done in GenericController,

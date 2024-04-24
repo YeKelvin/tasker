@@ -289,7 +289,7 @@ class TestCompiler(HashTreeTraverser):
         timers = deque()
 
         if DEBUG:
-            logger.debug(f'取样器:[ {sampler} ] 开始配置取样包')
+            logger.debug(f'请求:[ {sampler} ] 开始配置取样包')
         for i in range(len(self.stack) - 1, -1, -1):  # 倒序遍历
             maybe_controller = self.stack[i]
             if isinstance(maybe_controller, Controller):
@@ -324,7 +324,7 @@ class TestCompiler(HashTreeTraverser):
         sorted_assertions = sorted(assertions, key=lambda x:x.level, reverse=('ASSERT' in reverse_order))
 
         if DEBUG:
-            logger.debug(f'取样器:[ {sampler} ] 取样包配置完成')
+            logger.debug(f'请求:[ {sampler} ] 取样包配置完成')
 
         package = SamplePackage(
             list(configs),

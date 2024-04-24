@@ -28,7 +28,7 @@ class VariableSet(Function):
         ctx = ContextService.get_context()
         ctx.variables.put(name, value)
         logger.info(
-            f'线程:[ {ctx.thread_name} ] 取样器:[ {ctx.current_sampler.name} ] 函数:[ __setvar ] 设置局部变量\n'
+            f'线程:[ {ctx.thread_name} ] 请求:[ {ctx.current_sampler.name} ] 函数:[ __setvar ] 设置局部变量\n'
             f'变量名:[ {name} ]\n'
             f'变量值:[ {value} ]'
         )

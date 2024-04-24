@@ -150,7 +150,7 @@ class ForeachController(GenericController, IteratingController):
                 self.init_foreach()
 
             if self.end_of_loop():
-                logger.debug(f'线程:[ {self.ctx.thread_name} ] 控制器:[ {self.name} ] 获取下一个取样器')
+                logger.debug(f'线程:[ {self.ctx.thread_name} ] 控制器:[ {self.name} ] 获取下一个请求')
                 self.re_initialize()
                 self.reset_break_loop()
                 logger.debug(f'线程:[ {self.ctx.thread_name} ] 控制器:[ {self.name} ] 下一个为空')

@@ -52,7 +52,7 @@ class LoopController(GenericController, IteratingController):
         # noinspection PyBroadException
         try:
             if self.end_of_loop():
-                logger.debug(f'线程:[ {self.ctx.thread_name} ] 控制器:[ {self.name} ] 获取下一个取样器')
+                logger.debug(f'线程:[ {self.ctx.thread_name} ] 控制器:[ {self.name} ] 获取下一个请求')
                 if not self.continue_forever:
                     self.done = True
                 self.reset_break_loop()

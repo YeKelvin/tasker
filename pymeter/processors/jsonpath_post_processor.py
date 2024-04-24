@@ -64,7 +64,7 @@ class JsonPathPostProcessor(PostProcessor):
         if not varname:
             logger.warning(
                 f'线程:[ {ctx.thread_name} ] '
-                f'取样器:[ {ctx.current_sampler.name} ] '
+                f'请求:[ {ctx.current_sampler.name} ] '
                 f'处理器:[ {self.name} ] 警告: 变量名称为空，请修改写后重试'
             )
             return
@@ -72,7 +72,7 @@ class JsonPathPostProcessor(PostProcessor):
         if not jsonpath:
             logger.warning(
                 f'线程:[ {ctx.thread_name} ] '
-                f'取样器:[ {ctx.current_sampler.name} ] '
+                f'请求:[ {ctx.current_sampler.name} ] '
                 f'处理器:[ {self.name} ] 警告: JsonPath为空，请修改写后重试')
             return
 
@@ -83,14 +83,14 @@ class JsonPathPostProcessor(PostProcessor):
                 actualvalue = self.extract(response_data, jsonpath)
                 if actualvalue is not None:
                     logger.info(
-                        f'线程:[ {ctx.thread_name} ] 取样器:[ {ctx.current_sampler.name} ] Json提取成功\n'
+                        f'线程:[ {ctx.thread_name} ] 请求:[ {ctx.current_sampler.name} ] Json提取成功\n'
                         f'表达式:[ {jsonpath} ]\n'
                         f'变量名:[ {varname} ]\n'
                         f'变量值:[ {actualvalue} ]'
                     )
                 else:
                     logger.info(
-                        f'线程:[ {ctx.thread_name} ] 取样器:[ {ctx.current_sampler.name} ] Json提取失败\n'
+                        f'线程:[ {ctx.thread_name} ] 请求:[ {ctx.current_sampler.name} ] Json提取失败\n'
                         f'表达式:[ {jsonpath} ]\n'
                         f'变量名:[ {varname} ]\n'
                         f'变量值:[ {actualvalue} ]'
@@ -99,7 +99,7 @@ class JsonPathPostProcessor(PostProcessor):
             # 设置默认值
             elif self.default_value:
                 logger.info(
-                    f'线程:[ {ctx.thread_name} ] 取样器:[ {ctx.current_sampler.name} ] Json提取为空，赋予默认值\n'
+                    f'线程:[ {ctx.thread_name} ] 请求:[ {ctx.current_sampler.name} ] Json提取为空，赋予默认值\n'
                     f'变量名:[ {varname} ]\n'
                     f'变量值:[ {self.default_value} ]'
                 )
@@ -109,7 +109,7 @@ class JsonPathPostProcessor(PostProcessor):
             # 设置默认值
             if self.default_value:
                 logger.info(
-                    f'线程:[ {ctx.thread_name} ] 取样器:[ {ctx.current_sampler.name} ] Json提取异常，赋予默认值\n'
+                    f'线程:[ {ctx.thread_name} ] 请求:[ {ctx.current_sampler.name} ] Json提取异常，赋予默认值\n'
                     f'变量名:[ {jsonpath} ]\n'
                     f'变量值:[ {self.default_value} ]'
                 )

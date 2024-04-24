@@ -67,7 +67,7 @@ class StandardEngine(Engine):
         worker_total += self._process_teardown_worker(teardown_worker_searcher, collection_component_list)
 
         if worker_total == 0:
-            logger.warning('集合不存在 #工作者# 或已禁用')
+            logger.warning('集合不存在 #有效用例#')
 
         # 遍历执行 TestCollectionListener
         self._notify_collection_listeners_of_end(collection_listener_searcher)
@@ -88,7 +88,7 @@ class StandardEngine(Engine):
         if not setup_worker_searcher.count:
             return 0
 
-        logger.info('开始处理 #前置工作者#')
+        logger.info('开始处理 #前置用例#')
         worker_count = 0
         setup_worker_iter = iter(setup_worker_searcher.get_search_result())
         while self.running:
@@ -96,29 +96,29 @@ class StandardEngine(Engine):
                 setup_worker: SetupWorker = next(setup_worker_iter)
                 worker_count += 1
                 worker_name = setup_worker.name
-                logger.info(f'工作者:[ {worker_name} ] 初始化第 {worker_count} 个 #前置工作者#')
+                logger.info(f'用例:[ {worker_name} ] 初始化第 {worker_count} 个 #前置用例#')
                 self._start_worker(setup_worker, worker_count, setup_worker_searcher, collection_component_list)
 
                 # 需要顺序执行时，则等待当前线程执行完毕再继续下一个循环
                 if self.sequential:
-                    logger.info(f'工作者:[ {worker_name} ] 等待当前 #前置工作者# 执行完成')
+                    logger.info(f'用例:[ {worker_name} ] 等待当前 #前置用例# 执行完成')
                     setup_worker.wait_threads_stopped()
             except StopIteration:
-                logger.info('所有 #前置工作者# 已启动')
+                logger.info('所有 #前置用例# 已启动')
                 break
 
-        logger.info('等待所有 #前置工作者# 执行完成')
+        logger.info('等待所有 #前置用例# 执行完成')
         self._wait_workers_stopped()
         self.workers.clear()  # The workers have all completed now
         ContextService.clear_total_threads()
-        logger.info('所有 #前置工作者# 已执行完成')
+        logger.info('所有 #前置用例# 已执行完成')
         return worker_count
 
     def _process_test_worker(self, test_worker_searcher, collection_component_list):
         if not test_worker_searcher.count:
             return 0
 
-        logger.info(f'开始 #{"串行" if self.sequential else "并行"}# 处理 #工作者#')
+        logger.info(f'开始 #{"串行" if self.sequential else "并行"}# 处理 #用例#')
         worker_count = 0
         test_worker_iter = iter(test_worker_searcher.get_search_result())
         while self.running:
@@ -128,35 +128,35 @@ class StandardEngine(Engine):
                     continue
                 worker_count += 1
                 worker_name = test_worker.name
-                logger.info(f'工作者:[ {worker_name} ] 初始化第 {worker_count} 个 #工作者#')
+                logger.info(f'用例:[ {worker_name} ] 初始化第 {worker_count} 个 #用例#')
                 self._start_worker(test_worker, worker_count, test_worker_searcher, collection_component_list)
 
                 # 需要顺序执行时，则等待当前线程执行完毕再继续下一个循环
                 if self.sequential:
-                    logger.info(f'工作者:[ {worker_name} ] 等待当前 #工作者# 执行完成')
+                    logger.info(f'用例:[ {worker_name} ] 等待当前 #用例# 执行完成')
                     test_worker.wait_threads_stopped()
             except StopIteration:
-                logger.info('所有 #工作者# 已启动')
+                logger.info('所有 #用例# 已启动')
                 break
 
         if worker_count > 0:
             if not self.running:
-                logger.info('测试已停止，不再启动剩余的 #工作者# ')
+                logger.info('测试已停止，不再启动剩余的 #用例# ')
             if not self.sequential:
-                logger.info('等待所有 #工作者# 执行完成')
+                logger.info('等待所有 #用例# 执行完成')
 
-        logger.info('等待所有 #工作者# 执行完成')
+        logger.info('等待所有 #用例# 执行完成')
         self._wait_workers_stopped()
         self.workers.clear()  # The workers have all completed now
         ContextService.clear_total_threads()
-        logger.info('所有 #工作者# 已执行完成')
+        logger.info('所有 #用例# 已执行完成')
         return worker_count
 
     def _process_teardown_worker(self, teardown_worker_searcher, collection_component_list):
         if not teardown_worker_searcher.count:
             return 0
 
-        logger.info('开始处理 #后置工作者#')
+        logger.info('开始处理 #后置用例#')
         worker_count = 0
         teardown_worker_iter = iter(teardown_worker_searcher.get_search_result())
         while self.running:
@@ -164,22 +164,22 @@ class StandardEngine(Engine):
                 teardown_worker: TeardownWorker = next(teardown_worker_iter)
                 worker_count += 1
                 worker_name = teardown_worker.name
-                logger.info(f'工作者:[ {worker_name} ] 初始化第 {worker_count} 个 #后置工作者#')
+                logger.info(f'用例:[ {worker_name} ] 初始化第 {worker_count} 个 #后置用例#')
                 self._start_worker(teardown_worker, worker_count, teardown_worker_searcher, collection_component_list)
 
                 # 需要顺序执行时，则等待当前线程执行完毕再继续下一个循环
                 if self.sequential:
-                    logger.info(f'工作者:[ {worker_name} ] 等待当前 #后置工作者# 完成')
+                    logger.info(f'用例:[ {worker_name} ] 等待当前 #后置用例# 完成')
                     teardown_worker.wait_threads_stopped()
             except StopIteration:
-                logger.info('所有 #后置工作者# 已启动')
+                logger.info('所有 #后置用例# 已启动')
                 break
 
-        logger.info('等待所有 #后置工作者# 执行完成')
+        logger.info('等待所有 #后置用例# 执行完成')
         self._wait_workers_stopped()
         self.workers.clear()  # The workers have all completed now
         ContextService.clear_total_threads()
-        logger.info('所有 #后置工作者# 已执行完成')
+        logger.info('所有 #后置用例# 已执行完成')
         return worker_count
 
     def _start_worker(
@@ -208,7 +208,7 @@ class StandardEngine(Engine):
             # 将 Collection 层的组件节点（非 TestWorker 节点）添加至 TestWorker
             worker_tree = worker_searcher.get(worker)
             worker_tree.add_key(worker).add_keys(collection_component_list)
-            logger.info(f'工作者:[ {worker_name} ] 线程数:[ {number_of_threads} ] 启动 #工作者#')
+            logger.info(f'用例:[ {worker_name} ] 线程数:[ {number_of_threads} ] 启动 #用例#')
 
             # 存储当前 TestWorker，用于后续管理线程（启动、停止或循环）
             self.workers.append(worker)

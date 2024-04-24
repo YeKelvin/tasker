@@ -41,7 +41,7 @@ class GenericController(Controller, TestCompilerHelper):
         # 是否控制器下的第一个元素（Sampler 或 Controller）
         self._first = True
 
-        # 是否已经完成控制器下所有的取样器和迭代
+        # 是否已经完成控制器下所有的请求和迭代
         self._done = False
 
     @property
@@ -109,7 +109,7 @@ class GenericController(Controller, TestCompilerHelper):
 
     def next(self) -> Sampler | None:
         """获取控制器的下一个子代元素"""
-        logger.debug(f'线程:[ {self.ctx.thread_name} ] 控制器:[ {self.name} ] 获取下一个取样器')
+        logger.debug(f'线程:[ {self.ctx.thread_name} ] 控制器:[ {self.name} ] 获取下一个请求')
         self.fire_iter_events()
 
         if self.done:
@@ -158,10 +158,10 @@ class GenericController(Controller, TestCompilerHelper):
 
     def next_is_controller(self, controller: Controller) -> Sampler:
         """下一个元素是控制器时的处理方法"""
-        # 获取子代控制器的下一个取样器
+        # 获取子代控制器的下一个请求
         logger.debug(f'线程:[ {self.ctx.thread_name} ] 控制器:[ {self.name} ] 下一个为控制器')
         sampler = controller.next()
-        # 子代控制器的下一个取样器为空时重新获取父控制器的下一个取样器
+        # 子代控制器的下一个请求为空时重新获取父控制器的下一个请求
         if sampler is None:
             self.current_returned_none(controller)
             sampler = self.next()
@@ -173,7 +173,7 @@ class GenericController(Controller, TestCompilerHelper):
         return None
 
     def current_returned_none(self, controller: Controller):
-        """子代控制器的下一个取样器为空时的处理方法"""
+        """子代控制器的下一个请求为空时的处理方法"""
         if controller.done:
             self.remove_current_element()
         else:

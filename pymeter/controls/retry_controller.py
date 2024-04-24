@@ -79,7 +79,7 @@ class RetryController(GenericController, IteratingController, LoopIterationListe
 
                 # 添加重试标识，最后一次无需添加
                 nsampler.retrying = self._retry_count < self.retries - 1
-                # 给重试取样器名称添加重试标识后缀
+                # 给重试的请求的名称添加重试标识后缀
                 if self._retry_count < self.retries:
                     nsampler.retry_flag = f'[{self.flag_prefix}{self._retry_count + 1}]' if self.flag_prefix else None
 
@@ -92,7 +92,7 @@ class RetryController(GenericController, IteratingController, LoopIterationListe
         self.re_initialize()
         if self.last_sample_ok:
             logger.debug(
-                f'线程:[ {self.ctx.thread_name} ] 控制器:[ {self.name} ] 取样器取样成功, 停止重试'
+                f'线程:[ {self.ctx.thread_name} ] 控制器:[ {self.name} ] 请求成功, 测试通过，停止重试'
             )
             self.done = True
             return None

@@ -23,7 +23,7 @@ class SleepPostProcessor(PostProcessor):
     def process(self) -> None:
         ctx = ContextService.get_context()
         try:
-            logger.info(f'线程:[ {ctx.thread_name} ] 取样器:[ {ctx.current_sampler.name} ] 后置等待 {self.delay} ms')
+            logger.info(f'线程:[ {ctx.thread_name} ] 请求:[ {ctx.current_sampler.name} ] 后置等待 {self.delay} ms')
             gevent.sleep(float(self.delay) / 1000)
         except Exception:
             logger.exception('Exception Occurred')

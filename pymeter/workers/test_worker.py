@@ -44,7 +44,7 @@ class TestWorker(Worker, TestCompilerHelper):
     # 运行策略
     RUNNING_STRATEGY = 'TestWorker__running_strategy'
 
-    # 取样器失败时的处理逻辑
+    # 请求失败时的处理逻辑
     ON_SAMPLE_ERROR = 'TestWorker__on_sample_error'
 
     # 线程数
@@ -116,8 +116,8 @@ class TestWorker(Worker, TestCompilerHelper):
         """启动 TestWorker
 
         Args:
-            worker_number:   工作者编号
-            worker_tree:     工作者HashTree
+            worker_number:   worker编号
+            worker_tree:     worker哈希树
             engine:          测试引擎
 
         Returns: None
@@ -134,7 +134,7 @@ class TestWorker(Worker, TestCompilerHelper):
             else:
                 break
 
-        logger.info(f'开始执行第 {self.worker_number} 个 #工作者#')
+        logger.info(f'开始执行第 {self.worker_number} 个 #用例#')
 
     @property
     def done(self):
@@ -311,11 +311,11 @@ class Coroutine(Greenlet):
         ContextService.init_loguru()
 
         # 编译 TestWorker 的子代节点
-        logger.debug('开始编译工作者节点')
+        logger.debug('开始编译用例节点')
         # logger.debug(f'TestWorker的HashTree结构:\n{self.worker_tree}')
         self.compiler.strategy = self.compile_strategy
         self.worker_tree.traverse(self.compiler)
-        logger.debug('工作者节点编译完成')
+        logger.debug('用例节点编译完成')
         # logger.debug(f'TestWorker的HashTree结构:\n{self.worker_tree}')
 
         # 初始化 TestWorker 控制器
@@ -355,15 +355,15 @@ class Coroutine(Greenlet):
                 # 如果主控制器标记已完成，则结束迭代
                 if self.worker_main_controller.done:
                     self.running = False
-                    logger.info(f'线程:[ {self.thread_name} ] 已停止运行，结束迭代')
+                    logger.info(f'线程:[ {self.thread_name} ] 已停止，执行结束')
         except StopTestWorkerException:
-            logger.debug(f'线程:[ {self.thread_name} ] 捕获:[ StopTestWorkerException ] 停止主线程')
+            logger.debug(f'线程:[ {self.thread_name} ] 捕获异常:[ StopTestWorkerException ] 停止执行用例')
             self.stop_worker()
         except StopTestException:
-            logger.debug(f'线程:[ {self.thread_name} ] 捕获:[ StopTestException ] 停止测试')
+            logger.debug(f'线程:[ {self.thread_name} ] 捕获异常:[ StopTestException ] 停止执行测试')
             self.stop_test()
         except StopTestNowException:
-            logger.debug(f'线程:[ {self.thread_name} ] 捕获:[ StopTestNowException ] 立即停止测试')
+            logger.debug(f'线程:[ {self.thread_name} ] 捕获:[ StopTestNowException ] 立即停止执行')
             self.stop_now()
         except UserInterruptedError:
             logger.warning('用户主动中断，立即停止测试')
@@ -482,7 +482,7 @@ class Coroutine(Greenlet):
             context: ThreadContext
     ) -> SampleResult:
         """执行 Sampler"""
-        logger.debug(f'线程:[ {self.thread_name} ] 当前取样器:[ {current} ]')
+        logger.debug(f'线程:[ {self.thread_name} ] 当前请求:[ {current} ]')
 
         transaction_result = None
         transaction_sampler = None
@@ -546,7 +546,7 @@ class Coroutine(Greenlet):
             transaction_package: SamplePackage,
             context: ThreadContext
     ) -> None:
-        """执行取样器"""
+        """执行请求"""
         # 上下文存储当前sampler
         context.set_current_sampler(sampler)
         # 获取sampler对应的package
@@ -557,7 +557,7 @@ class Coroutine(Greenlet):
         # 执行时间控制器
         self.__run_timers(package.timers)
 
-        # 执行取样器
+        # 执行请求
         result = None
         if self.running:
             result = self.__do_sampling(sampler, context, package.listeners)
@@ -619,7 +619,7 @@ class Coroutine(Greenlet):
         result = None
         # noinspection PyBroadException
         try:
-            logger.info(f'线程:[ {self.thread_name} ] 取样器:[ {sampler.name} ] 开始请求')
+            logger.info(f'线程:[ {self.thread_name} ] 请求:[ {sampler.name} ] 开始请求')
             result = sampler.sample()
         except Exception as err:
             logger.exception('Exception Occurred')
@@ -794,7 +794,7 @@ class Coroutine(Greenlet):
             self.__process_assertion(assertion, result)
 
         logger.debug(
-            f'线程:[ {self.thread_name} ] 取样器:[ {result.sample_name} ] 设置变量 LAST_SAMPLE_OK={result.success}'
+            f'线程:[ {self.thread_name} ] 请求:[ {result.sample_name} ] 设置变量 LAST_SAMPLE_OK={result.success}'
         )
         # 存储取样结果
         context.variables.put(self.LAST_SAMPLE_OK, result.success)
@@ -805,17 +805,17 @@ class Coroutine(Greenlet):
         try:
             assertion_result = assertion.get_result(sample_result)
         except AssertionError as e:
-            logger.debug(f'线程:[ {self.thread_name} ] 取样器:[ {sample_result.sample_name} ] 断言器: {e}')
+            logger.debug(f'线程:[ {self.thread_name} ] 请求:[ {sample_result.sample_name} ] 断言器: {e}')
             assertion_result = AssertionResult(sample_result.sample_name)
             assertion_result.failure = True
             assertion_result.message = str(e)
         except RuntimeError as e:
-            logger.error(f'线程:[ {self.thread_name} ] 取样器:[ {sample_result.sample_name} ] 断言器: {e}')
+            logger.error(f'线程:[ {self.thread_name} ] 请求:[ {sample_result.sample_name} ] 断言器: {e}')
             assertion_result = AssertionResult(sample_result.sample_name)
             assertion_result.error = True
             assertion_result.message = str(e)
         except Exception as e:
-            logger.error(f'线程:[ {self.thread_name} ] 取样器:[ {sample_result.sample_name} ] 断言器: {e}')
+            logger.error(f'线程:[ {self.thread_name} ] 请求:[ {sample_result.sample_name} ] 断言器: {e}')
             logger.exception('Exception Occurred')
             assertion_result = AssertionResult(sample_result.sample_name)
             assertion_result.error = True

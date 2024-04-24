@@ -12,7 +12,7 @@ class SetupWorker(TestWorker):
     # 运行策略
     RUNNING_STRATEGY: Final = 'SetupWorker__running_strategy'
 
-    # 取样器失败时的处理逻辑
+    # 请求失败时的处理逻辑
     ON_SAMPLE_ERROR: Final = 'SetupWorker__on_sample_error'
 
     # 线程数

@@ -79,7 +79,7 @@ class TransactionController(GenericController):
 class TransactionSampler(Sampler):
 
     def __init__(self, controller: TransactionController, name: str):
-        super().__init__(name)
+        super().__init__(name=name)
         self.controller = controller
         self.done = False
         self.sub_sampler = None

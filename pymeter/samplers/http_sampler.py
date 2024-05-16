@@ -301,6 +301,13 @@ class HTTPSampler(Sampler):
 
         self.set_property(self.HEADERS, new_manager)
 
+    def get_header_manager(self):
+        headers = self.header_manager
+        if headers is None:
+            headers = HTTPHeaderManager()
+            self.set_header_manager(headers)
+        return headers
+
     def set_session_manager(self, manager: SessionManager):
         self.session_manager = manager
 

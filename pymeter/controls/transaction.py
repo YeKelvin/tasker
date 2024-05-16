@@ -2,6 +2,8 @@
 # @File    : transaction.py
 # @Time    : 2021-08-24 23:23:12
 # @Author  : Kelvin.Ye
+from typing import Final
+
 from loguru import logger
 
 from pymeter.controls.controller import Controller
@@ -77,6 +79,9 @@ class TransactionController(GenericController):
 
 
 class TransactionSampler(Sampler):
+
+    # 请求类型
+    REQUEST_TYPE: Final = 'TRANSACTION'
 
     def __init__(self, controller: TransactionController, name: str):
         super().__init__(name=name)

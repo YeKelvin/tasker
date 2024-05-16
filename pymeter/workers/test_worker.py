@@ -508,10 +508,10 @@ class Coroutine(Greenlet):
                     logger.debug(f'线程:[ {self.thread_name} ] 遍历触发 TransactionListener 的开始事件')
                     for listener in transaction_package.trans_listeners:
                         listener.transaction_started()
-                # 获取 Transaction 直系子代
+                # 获取 Transaction 直接子代
                 prev = current
                 current = transaction_sampler.sub_sampler
-                # 如果 Transaction 直系子代还是 Transaction，则递归执行
+                # 如果 Transaction 直接子代还是 Transaction，则递归执行
                 if isinstance(current, TransactionSampler):
                     result = self.__process_sampler(current, prev, context)  # 递归处理
                     context.set_current_sampler(prev)
@@ -617,7 +617,6 @@ class Coroutine(Greenlet):
             listener.sample_started(sampler)
 
         result = None
-        # noinspection PyBroadException
         try:
             logger.info(f'线程:[ {self.thread_name} ] 请求:[ {sampler.name} ] 开始请求')
             result = sampler.sample()
@@ -645,6 +644,9 @@ class Coroutine(Greenlet):
         logger.debug(
             f'线程:[ {self.thread_name} ] 事务:[ {transaction_sampler} ] 父元素:[ {parent} ] 结束事务'
         )
+
+        # 上下文存储当前sampler（事务）
+        context.set_current_sampler(transaction_sampler)
 
         # Get the transaction sample result
         result = transaction_sampler.result
@@ -688,12 +690,6 @@ class Coroutine(Greenlet):
             only_subsampler_listeners = []
             for listener in sample_package.listeners:
                 # 检查在 TransactionListenerList 中是否有重复的 listener
-                # found = False
-                # for trans in transaction_package.listeners:
-                #     # 过滤相同的 listener
-                #     if trans is listener:
-                #         found = True
-                #         break
                 found = any(trans is listener for trans in transaction_package.listeners)
                 if not found:
                     only_subsampler_listeners.append(listener)

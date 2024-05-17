@@ -645,14 +645,11 @@ class Coroutine(Greenlet):
             f'线程:[ {self.thread_name} ] 事务:[ {transaction_sampler} ] 父元素:[ {parent} ] 结束事务'
         )
 
-        # 上下文存储当前sampler（事务）
-        context.set_current_sampler(transaction_sampler)
-
         # Get the transaction sample result
         result = transaction_sampler.result
 
-        # Check assertions for the transaction sample
-        self.__check_assertions(transaction_package.assertions, result, context)
+        # 暂时不做事务本身（TransactionSampler）的断言，这里会存在一些问题
+        # self.__check_assertions(transaction_package.assertions, result, context)
 
         #  Notify listeners with the transaction sample result
         if not isinstance(parent, TransactionSampler):

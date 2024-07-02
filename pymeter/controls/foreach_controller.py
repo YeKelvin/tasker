@@ -83,7 +83,7 @@ class ForeachController(GenericController, IteratingController):
             self._target[i] = key.strip()
 
         # 获取迭代对象
-        if self.data_source == 'OBJECT':
+        if self.data_source == 'VARIABLE':
             self._iterable_obj = self.ctx.variables.get(
                 self.iterable_obj,
                 self.ctx.properties.get(self.iterable_obj)

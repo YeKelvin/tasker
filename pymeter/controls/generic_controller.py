@@ -65,7 +65,7 @@ class GenericController(Controller, TestCompilerHelper):
     @done.setter
     def done(self, val: bool):
         """@override"""
-        logger.debug(f'线程:[ {self.ctx.thread_name} ] 控制器:[ {self.name} ] set done:[ {val} ]')
+        logger.debug(f'线程:[ {self.ctx.thread_name} ] 控制器:[ {self.name} ] 设置为{"完成" if val else "未完成"}')
         self._done = val
 
     @property
@@ -82,6 +82,7 @@ class GenericController(Controller, TestCompilerHelper):
 
     def initialize(self):
         """初始化控制器"""
+        logger.debug(f'线程:[ {self.ctx.thread_name} ] 控制器:[ {self.name} ] 初始化控制器')
         self.done = False
         self.first = True
         self.reset_current()
@@ -96,6 +97,7 @@ class GenericController(Controller, TestCompilerHelper):
 
     def re_initialize(self):
         """重新初始化控制器（在控制器最后一个子代元素执行完成之后调用）"""
+        logger.debug(f'线程:[ {self.ctx.thread_name} ] 控制器:[ {self.name} ] 重新初始化控制器')
         self.first = True
         self.increment_iter_count()
         self.reset_current()
@@ -113,7 +115,7 @@ class GenericController(Controller, TestCompilerHelper):
         self.fire_iter_events()
 
         if self.done:
-            return None
+            return
 
         next_sampler = None
         try:
@@ -174,10 +176,16 @@ class GenericController(Controller, TestCompilerHelper):
 
     def current_returned_none(self, controller: Controller):
         """子代控制器的下一个请求为空时的处理方法"""
-        if controller.done:
-            self.remove_current_element()
-        else:
-            self.increment_current()
+        # TODO: 不移除控制器，会有bug，但是JMeter会移除，以后重构再优化
+        # if controller.done:
+        #     logger.debug(
+        #         f'线程:[ {self.ctx.thread_name} ] 控制器:[ {self.name} ] 子控制器:[ {controller.name} ] '
+        #         f'已完成，移除出队列'
+        #     )
+        #     self.remove_current_element()
+        # else:
+        #     self.increment_current()
+        self.increment_current()
 
     def add_element(self, child):
         self.sub_elements.append(child)
@@ -205,5 +213,6 @@ class GenericController(Controller, TestCompilerHelper):
         self.iteration_listeners.remove(listener)
 
     def trigger_end_of_loop(self):
-        """触发结束循环"""
+        """触发循环结束"""
+        logger.debug(f'线程:[ {self.ctx.thread_name} ] 控制器:[ {self.name} ] 触发循环结束')
         self.re_initialize()

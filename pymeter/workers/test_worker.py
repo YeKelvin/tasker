@@ -5,6 +5,7 @@
 from typing import Final
 
 import gevent
+
 from gevent import Greenlet
 from loguru import logger
 
@@ -787,7 +788,7 @@ class Coroutine(Greenlet):
             self.__process_assertion(assertion, result)
 
         logger.debug(
-            f'线程:[ {self.thread_name} ] 请求:[ {result.sample_name} ] 设置变量 LAST_SAMPLE_OK={result.success}'
+            f'线程:[ {self.thread_name} ] 请求:[ {result.sample_name} ] 设置变量LAST_SAMPLE_OK={result.success}'
         )
         # 存储取样结果
         context.variables.put(self.LAST_SAMPLE_OK, result.success)

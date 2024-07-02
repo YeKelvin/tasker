@@ -42,7 +42,7 @@ class SamplePackage:
         self.recover_running_version()
 
     def set_running_version(self, running: bool) -> None:
-        logger.debug(f'取样包:[ {self.sampler} ] 设置 running={running}')
+        logger.debug(f'取样包:[ {self.sampler} ] 设置running={running}')
         for el in self.configs:
             el.running_version = running
         for el in self.listeners:

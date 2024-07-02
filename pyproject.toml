@@ -22,30 +22,30 @@ classifiers = [
 [[tool.poetry.source]]
 name = "aliyun"
 url = "https://mirrors.aliyun.com/pypi/simple/"
-priority = "default"
+priority = "primary"
 
 [[tool.poetry.source]]
 name = "tsinghua"
 url = "https://pypi.tuna.tsinghua.edu.cn/simple/"
-priority = "primary"
+priority = "supplemental"
 
 [tool.poetry.dependencies]
 python = "^3.11"
-orjson = "3.10.3"
+orjson = "3.10.5"
 jsonpath = "0.82.2"
 xmltodict = "0.13.0"
-sqlalchemy = "2.0.30"
+sqlalchemy = "2.0.31"
 pyodbc = "5.1.0"
 cx-oracle = "8.3.0"
 psycopg2-binary = "2.9.9"
 mysql-connector-python = "8.4.0"
 sshtunnel = "0.4.0"
 pycryptodome = "3.20.0"
-python-engineio = "4.9.0"
-python-socketio = "5.11.2"
+python-engineio = "4.9.1"
+python-socketio = "5.11.3"
 ulid-py = "1.1.0"
 arrow = "1.3.0"
-faker = "25.2.0"
+faker = "26.0.0"
 httpx = "0.27.0"
 json5 = "0.9.25"
 bidict = "0.23.1"
@@ -54,15 +54,14 @@ gevent = "24.2.1"
 uvloop = "0.19.0"
 pytypes = "1.0b10"
 tabulate = "0.9.0"
-requests = "2.31.0"
+requests = "2.32.3"
 
 [tool.poetry.group.dev.dependencies]
 flask = "*"
 pytest = "*"
 pytest-html = "*"
+pytest-asyncio = "*"
 ruff = "*"
-yapf = "*"
-black = "*"
 
 [tool.ruff]
 target-version = "py311"
@@ -84,37 +83,25 @@ ignore = [
     "D104",
     "D105",
     "D107",
-    "D205",
-    "D212",
-    "D403",
     "D415"
 ]
 exclude = [
-    ".git/",
-    ".cache/",
-    "__pycache__/",
-    "*.log"
+    "__pycache__",
+    ".cache",
+    ".vscode",
+    "sql",
+    "docs",
+    "scripts",
+    "ruff_cache"
 ]
 
 [tool.ruff.pydocstyle]
 convention = "google"
 
 [tool.ruff.isort]
-known-local-folder = ["pymeter"]
 force-single-line = true
 lines-after-imports = 2
-
-[tool.yapf]
-column_limit = 120
-indent_width = 4
-arithmetic_precedence_indication = true
-blank_line_before_nested_class_or_def = true
-blank_lines_between_top_level_imports_and_variables = 2
-coalesce_brackets = true
-dedent_closing_brackets = true
-join_multiple_lines = true
-spaces_before_comment = 2
-split_before_dot = true
+lines-between-types = 1
 
 [tool.pytest.ini_options]
 minversion = "6.0"

@@ -3,9 +3,11 @@
 # @Time    : 2021-08-26 18:08:15
 # @Author  : Kelvin.Ye
 import time
+
 from typing import Final
 
 import gevent
+
 from loguru import logger
 
 from pymeter.controls.controller import IteratingController

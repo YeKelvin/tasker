@@ -27,10 +27,9 @@ class TestElement:
         self._running_version = False
         self.level = None
         self.context = None
-        self.properties = {}                # type: dict[str, PyMeterProperty]
-        self.temporary_properties = None    # type: deque
-        if name:
-            self.set_property(self.NAME, name)
+        self.properties = {}      # type: dict[str, PyMeterProperty]
+        self.temporarys = None    # type: deque | None
+        name and self.set_property(self.NAME, name)
 
     @property
     def name(self) -> str:
@@ -62,11 +61,11 @@ class TestElement:
         for prop in list(self.properties.values()):
             if self.is_temporary(prop):
                 self.remove_property(prop.name)
-                self.clear_temporary(prop)
+                self.remove_temporary(prop)
             else:
                 prop.recover_running_version(self)
 
-        self.empty_temporary()
+        self.clear_temporary()
 
     def set_property(self, key: str, value: any) -> None:
         if not key:
@@ -90,7 +89,7 @@ class TestElement:
         if self.running_version:
             self.set_temporary(prop)
         else:
-            self.clear_temporary(prop)
+            self.remove_temporary(prop)
 
         self.properties[key] = prop
 
@@ -120,7 +119,7 @@ class TestElement:
         self.properties.pop(key)
 
     def add_test_element(self, element: 'TestElement') -> None:
-        """merge in"""
+        """Merge in"""
         for key, value in element.items():
             self.add_property(key, value)
 
@@ -134,7 +133,7 @@ class TestElement:
     def items(self):
         return self.properties.items()
 
-    def property_iterator(self) -> Iterable:
+    def property_iterator(self) -> Iterable[PyMeterProperty]:
         return self.properties.values()
 
     def clone(self) -> 'TestElement':
@@ -150,16 +149,16 @@ class TestElement:
         self.properties.clear()
 
     def is_temporary(self, prop) -> bool:
-        if self.temporary_properties is None:
+        if self.temporarys is None:
             return False
         else:
-            return prop in self.temporary_properties
+            return prop in self.temporarys
 
     def set_temporary(self, prop) -> None:
-        if self.temporary_properties is None:
-            self.temporary_properties = deque()
+        if self.temporarys is None:
+            self.temporarys = deque()
 
-        self.temporary_properties.append(prop)
+        self.temporarys.append(prop)
         # 虽然 TestElementProperty 正在实现 MultiProperty，但它的工作方式不同。
         # 它不会像 MultiProperty 那样一一合并内部属性。
         # 因此我们不能将 TestElementProperty 的封闭属性标记为临时。
@@ -167,13 +166,13 @@ class TestElement:
             for prop in prop.iterator():
                 self.set_temporary(prop)
 
-    def clear_temporary(self, prop):
-        if self.temporary_properties is not None:
-            self.temporary_properties.remove(prop)
+    def remove_temporary(self, prop):
+        if self.temporarys is not None:
+            self.temporarys.remove(prop)
 
-    def empty_temporary(self):
-        if self.temporary_properties is not None:
-            self.temporary_properties.clear()
+    def clear_temporary(self):
+        if self.temporarys is not None:
+            self.temporarys.clear()
 
     def __repr__(self):
         return self.__str__()

@@ -3,6 +3,7 @@
 # @Time    : 2020/2/16 14:16
 # @Author  : Kelvin.Ye
 from collections.abc import Iterable
+from copy import deepcopy
 
 from loguru import logger
 
@@ -20,7 +21,7 @@ class PyMeterProperty:
         return self._running_version
 
     @running_version.setter
-    def running_version(self, running):
+    def running_version(self, running: bool):
         self._running_version = running
 
     def get_str(self) -> str:
@@ -39,12 +40,13 @@ class PyMeterProperty:
         raise NotImplementedError
 
     def recover_running_version(self, owner) -> None:
+        """TODO: rename recover"""
         raise NotImplementedError
 
 
 class BasicProperty(PyMeterProperty):
 
-    def __init__(self, name: str, value=None):
+    def __init__(self, name: str, value: str | int | float | bool = None):
         super().__init__(name, value)
         self.saved_value = None
 
@@ -71,7 +73,8 @@ class BasicProperty(PyMeterProperty):
         return self._running_version
 
     @running_version.setter
-    def running_version(self, running):
+    def running_version(self, running: bool):
+        # TODO: 可以用 super() 吧
         PyMeterProperty.running_version = running
         self.saved_value = self.value if running else None
 
@@ -127,9 +130,9 @@ class ObjectProperty(PyMeterProperty):
         return self._running_version
 
     @running_version.setter
-    def running_version(self, running):
+    def running_version(self, running: bool):
         PyMeterProperty.running_version = running
-        self.saved_value = self.value if running else None
+        self.saved_value = deepcopy(self.value) if running else None
 
     def recover_running_version(self, owner) -> None:
         if self.saved_value is not None:
@@ -143,27 +146,18 @@ class MultiProperty(PyMeterProperty):
         return self._running_version
 
     @running_version.setter
-    def running_version(self, running):
+    def running_version(self, running: bool):
         self._running_version = running
         for prop in self.iterator():
             prop.running_version = running
 
-    def iterator(self) -> Iterable:
+    def iterator(self) -> Iterable[PyMeterProperty]:
         raise NotImplementedError
 
-    def remove(self, property):
+    def remove(self, prop: PyMeterProperty):
         raise NotImplementedError
 
-    def recover_running_version_of_subelements(self, owner):
-        """恢复运行版本
-
-        Args:
-            owner:  TestElement
-
-        Returns:
-            None
-
-        """
+    def recover_running_version_of_subelements(self, owner):  # owner: TestElement
         for prop in self.iterator()[:]:
             if owner.is_temporary(prop):
                 self.remove(prop)
@@ -190,13 +184,13 @@ class CollectionProperty(MultiProperty):
     def get_obj(self) -> list:
         return self.value
 
-    def remove(self, prop) -> None:
+    def remove(self, prop: PyMeterProperty) -> None:
         self.value.remove(prop)
 
-    def set(self, prop) -> None:
+    def set(self, prop: PyMeterProperty) -> None:
         self.value.append(prop)
 
-    def get(self, index) -> PyMeterProperty:
+    def get(self, index: int) -> PyMeterProperty:
         return self.value[index]
 
     def iterator(self) -> Iterable:
@@ -207,9 +201,9 @@ class CollectionProperty(MultiProperty):
         return self._running_version
 
     @running_version.setter
-    def running_version(self, running):
+    def running_version(self, running: bool):
         MultiProperty.running_version = running
-        self.saved_value = self.value if running else None
+        self.saved_value = deepcopy(self.value) if running else None
 
     def recover_running_version(self, owner) -> None:
         if self.saved_value is not None:
@@ -219,7 +213,7 @@ class CollectionProperty(MultiProperty):
 
 class TestElementProperty(MultiProperty):
 
-    def __init__(self, name: str, value):
+    def __init__(self, name: str, value):  # value: TestElement
         super().__init__(name, value)
         self.saved_value = None
 
@@ -232,7 +226,7 @@ class TestElementProperty(MultiProperty):
     def get_obj(self):
         return self.value
 
-    def remove(self, prop) -> None:
+    def remove(self, prop: PyMeterProperty) -> None:
         self.value.remove_property(prop.name)
 
     def iterator(self) -> Iterable:
@@ -243,10 +237,10 @@ class TestElementProperty(MultiProperty):
         return self._running_version
 
     @running_version.setter
-    def running_version(self, running):
+    def running_version(self, running: bool):
         MultiProperty.running_version = running
         self.value.running_version = running
-        self.saved_value = self.value if running else None
+        self.saved_value = self.value.clone() if running else None
 
     def recover_running_version(self, owner) -> None:
         if self.saved_value is not None:
@@ -257,9 +251,9 @@ class TestElementProperty(MultiProperty):
 class DictProperty(MultiProperty):
 
     def __init__(self, name: str, value: dict[str, PyMeterProperty] = None):
-        super().__init__(name, value)
         if value is None:
-            self.value = {}
+            value = {}
+        super().__init__(name, value)
         self.saved_value = None
 
     def get_str(self) -> str:
@@ -271,7 +265,7 @@ class DictProperty(MultiProperty):
     def get_obj(self) -> dict:
         return self.value
 
-    def remove(self, prop) -> None:
+    def remove(self, prop: PyMeterProperty) -> None:
         self.value.pop(prop.name)
 
     def iterator(self) -> Iterable:
@@ -282,7 +276,7 @@ class DictProperty(MultiProperty):
         return self._running_version
 
     @running_version.setter
-    def running_version(self, running):
+    def running_version(self, running: bool):
         MultiProperty.running_version = running
         self.saved_value = self.value if running else None
 
@@ -294,9 +288,9 @@ class DictProperty(MultiProperty):
 
 class FunctionProperty(PyMeterProperty):
 
-    def __init__(self, name: str, function):
+    def __init__(self, name: str, function):  # function: CompoundVariable
         super().__init__(name)
-        self.function = function  # CompoundVariable
+        self.function = function
         self.cache_value = None
         self.test_iteration = -1
 
@@ -309,7 +303,7 @@ class FunctionProperty(PyMeterProperty):
 
     def get_str(self) -> str:
         if not self.running_version:
-            logger.debug('非运行状态, 返回函数原始字符串')
+            logger.debug(f'非运行状态, 返回函数原始文本\n{self.function.raw_parameters}')
             return self.function.raw_parameters
 
         iteration = self.ctx.variables.iteration if self.ctx.variables else -1
@@ -317,7 +311,7 @@ class FunctionProperty(PyMeterProperty):
         if iteration < self.test_iteration:
             self.test_iteration = -1
 
-        if iteration > self.test_iteration or self.cache_value is None:
+        if (iteration > self.test_iteration) or (self.cache_value is None):
             logger.debug(f'元素属性:[ {self.name} ] 执行函数')
             self.test_iteration = iteration
             self.cache_value = self.function.execute()

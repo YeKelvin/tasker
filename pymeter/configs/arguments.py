@@ -87,20 +87,34 @@ class Arguments(ConfigTestElement):
     def arguments(self) -> list[Argument]:
         return self.get_property(self.ARGUMENTS).get_obj()
 
+    def add(self, name=None, value=None, desc=None, symbol='='):
+        self.add_argument(Argument(name, value, desc, symbol))
+
     def add_argument(self, arg: Argument):
         prop = TestElementProperty(arg.name, arg)
         if self.running_version:
             self.set_temporary(prop)
         self.arguments.append(arg)
 
-    def add(self, name=None, value=None, desc=None, connector='='):
-        self.add_argument(Argument(name, value, desc, connector))
-
     def to_dict(self) -> dict:
         return {arg.name: arg.value for arg in self.arguments}
 
     def to_list(self) -> list[Argument]:
         return self.arguments
+
+    def get(self, name: str) -> Argument:
+        return next((arg for arg in self.arguments if arg.name == name), None)
+
+    def has(self, name: str) -> bool:
+        return any(arg.name == name for arg in self.arguments)
+
+    def remove(self, name: str):
+        if argument := self.get(name):
+            self.arguments.remove(argument)
+
+    def remove_argument(self, argument: Argument):
+        if argument in self.arguments:
+            self.arguments.remove(argument)
 
     def clear(self):
         self.arguments.clear()

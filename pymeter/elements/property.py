@@ -40,7 +40,6 @@ class PyMeterProperty:
         raise NotImplementedError
 
     def recover_running_version(self, owner) -> None:
-        """TODO: rename recover"""
         raise NotImplementedError
 
 
@@ -206,7 +205,7 @@ class CollectionProperty(MultiProperty):
 
     def recover_running_version(self, owner) -> None:
         if self.saved_value is not None:
-            self.value = self.saved_value
+            self.value = deepcopy(self.saved_value)
         self.recover_running_version_of_subelements(owner)
 
 
@@ -239,7 +238,7 @@ class TestElementProperty(MultiProperty):
     def running_version(self, running: bool):
         MultiProperty.running_version = running
         self.value.running_version = running
-        self.saved_value = self.value.clone() if running else None
+        self.saved_value = self.value if running else None
 
     def recover_running_version(self, owner) -> None:
         if self.saved_value is not None:
@@ -277,11 +276,11 @@ class DictProperty(MultiProperty):
     @running_version.setter
     def running_version(self, running: bool):
         MultiProperty.running_version = running
-        self.saved_value = self.value if running else None
+        self.saved_value = deepcopy(self.value) if running else None
 
     def recover_running_version(self, owner) -> None:
         if self.saved_value is not None:
-            self.value = self.saved_value
+            self.value = deepcopy(self.saved_value)
         self.recover_running_version_of_subelements(owner)
 
 

@@ -74,7 +74,6 @@ class BasicProperty(PyMeterProperty):
 
     @running_version.setter
     def running_version(self, running: bool):
-        # TODO: 可以用 super() 吧
         PyMeterProperty.running_version = running
         self.saved_value = self.value if running else None
 

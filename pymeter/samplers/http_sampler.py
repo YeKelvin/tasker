@@ -7,6 +7,7 @@ from urllib.parse import urlparse
 from uuid import uuid4
 
 import httpx
+
 from httpx import Response
 from loguru import logger
 

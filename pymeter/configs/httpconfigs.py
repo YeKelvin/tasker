@@ -3,6 +3,7 @@
 # @Time    : 2020/2/17 15:41
 # @Author  : Kelvin.Ye
 import httpx
+
 from loguru import logger
 
 from pymeter.configs.arguments import Argument
@@ -124,11 +125,8 @@ class HTTPHeaderManager(ConfigTestElement):
             self.headers_as_list.append(header)
 
     def remove_header(self, name: str) -> None:
-        logger.error(f'{self.get_header(name)=}')
         if header := self.get_header(name):
-            logger.error('remove_header')
             self.headers_as_list.remove(header)
-        logger.error(f'{self.headers_as_list=}')
 
 
 class HTTPCookie(TestElement):

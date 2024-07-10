@@ -10,6 +10,7 @@ from pymeter.processors.post import PostProcessor
 from pymeter.tools.exceptions import ForbiddenPythonError
 from pymeter.tools.python_code_snippets import DEFAULT_LOCAL_IMPORT_MODULE
 from pymeter.tools.python_code_snippets import INDENT
+from pymeter.tools.python_security import check_security
 from pymeter.workers.context import ContextService
 
 
@@ -43,12 +44,11 @@ class PythonPostProcessor(PostProcessor):
             # 获取代码
             code = self.raw_function
 
-            # 禁止使用os模块
-            if 'import os' in code:
-                raise ForbiddenPythonError()
+            # 校验是否包含不允许使用的模块
+            check_security(code)
 
             # 动态生成函数
-            exec(self.raw_function, {'self': self}, {'self': self})
+            exec(code, {'self': self}, {'self': self})
 
             # 执行函数
             ctx = ContextService.get_context()
@@ -61,7 +61,7 @@ class PythonPostProcessor(PostProcessor):
                 result=ctx.previous_result,
                 sampler=ctx.current_sampler
             )
-        except ForbiddenPythonError:
-            logger.error(f'线程:[ {ContextService.get_context().thread_name} ] 脚本:[ {self.name} ] 禁止使用 os 模块')
+        except ForbiddenPythonError as m:
+            logger.error(f'线程:[ {ContextService.get_context().thread_name} ] 脚本:[ {self.name} ] 禁止使用 {m} 模块')
         except Exception:
             logger.exception('Exception Occurred')

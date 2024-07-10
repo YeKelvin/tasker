@@ -12,8 +12,8 @@ from pymeter.elements.element import TestElement
 from pymeter.elements.property import CollectionProperty
 from pymeter.engines.interface import TestIterationListener
 from pymeter.engines.interface import TestWorkerListener
-from pymeter.tools.exceptions import HTTPCookieDuplicateException
-from pymeter.tools.exceptions import HTTPHeaderDuplicateException
+from pymeter.tools.exceptions import HTTPCookieDuplicateError
+from pymeter.tools.exceptions import HTTPHeaderDuplicateError
 
 
 class HTTPHeader(TestElement):
@@ -104,7 +104,7 @@ class HTTPHeaderManager(ConfigTestElement):
 
     def add_header(self, name: str, value: str) -> None:
         if self.has_header(name):
-            raise HTTPHeaderDuplicateException(f'请求头:[ {name} ] 已存在')
+            raise HTTPHeaderDuplicateError(f'请求头:[ {name} ] 已存在')
 
         header = HTTPHeader()
         header.name = name
@@ -232,7 +232,7 @@ class HTTPCookieManager(ConfigTestElement):
 
     def add_cookie(self, name: str, value: str, domain: str = None, path: str = None) -> None:
         if self.has_cookie(name):
-            raise HTTPCookieDuplicateException(f'Cookie:[ {name} ] 已存在')
+            raise HTTPCookieDuplicateError(f'Cookie:[ {name} ] 已存在')
 
         cookie = HTTPCookie()
         cookie.name = name

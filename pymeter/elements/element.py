@@ -12,7 +12,7 @@ from pymeter.elements.property import NoneProperty
 from pymeter.elements.property import ObjectProperty
 from pymeter.elements.property import PyMeterProperty
 from pymeter.elements.property import TestElementProperty
-from pymeter.tools.exceptions import InvalidPropertyException
+from pymeter.tools.exceptions import InvalidPropertyError
 
 
 class TestElement:
@@ -69,7 +69,7 @@ class TestElement:
 
     def set_property(self, key: str, value: any) -> None:
         if not key:
-            raise InvalidPropertyException('键名不能为空')
+            raise InvalidPropertyError('键名不能为空')
 
         if self.running_version and not isinstance(prop := self.get_property(key), NoneProperty):
             prop.value = value

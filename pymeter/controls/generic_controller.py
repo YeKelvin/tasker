@@ -10,7 +10,7 @@ from pymeter.controls.controller import Controller
 from pymeter.engines.interface import LoopIterationListener
 from pymeter.engines.interface import TestCompilerHelper
 from pymeter.samplers.sampler import Sampler
-from pymeter.tools.exceptions import NextIsNullException
+from pymeter.tools.exceptions import NextIsNone
 from pymeter.workers.context import ContextService
 from pymeter.workers.context import ThreadContext
 
@@ -126,7 +126,7 @@ class GenericController(Controller, TestCompilerHelper):
                 next_sampler = self.next_is_sampler(current_element)
             else:
                 next_sampler = self.next_is_controller(current_element)
-        except NextIsNullException:
+        except NextIsNone:
             logger.debug(f'线程:[ {self.ctx.thread_name} ] 控制器:[ {self.name} ] 下一个为空')
 
         logger.debug(f'线程:[ {self.ctx.thread_name} ] 控制器:[ {self.name} ] 下一个:[ {next_sampler} ]')
@@ -149,7 +149,7 @@ class GenericController(Controller, TestCompilerHelper):
 
         if not self.sub_elements:
             self.done = True
-            raise NextIsNullException()
+            raise NextIsNone()
 
         return None
 

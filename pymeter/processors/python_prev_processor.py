@@ -7,6 +7,7 @@ from typing import Final
 from loguru import logger
 
 from pymeter.processors.prev import PrevProcessor
+from pymeter.tools.exceptions import ForbiddenPythonError
 from pymeter.tools.python_code_snippets import DEFAULT_LOCAL_IMPORT_MODULE
 from pymeter.tools.python_code_snippets import INDENT
 from pymeter.workers.context import ContextService
@@ -39,9 +40,18 @@ class PythonPrevProcessor(PrevProcessor):
 
     def process(self) -> None:
         try:
+            # 获取代码
+            code = self.raw_function
+
+            # 禁止使用os模块
+            if 'import os' in code:
+                raise ForbiddenPythonError()
+
+            # 动态生成函数
+            exec(self.raw_function, {'self': self}, {'self': self})
+
+            # 执行函数
             ctx = ContextService.get_context()
-            params = {'self': self}
-            exec(self.raw_function, params, params)
             self.dynamic_function(  # noqa
                 log=logger,
                 ctx=ctx,
@@ -51,5 +61,7 @@ class PythonPrevProcessor(PrevProcessor):
                 prev=ctx.previous_result,
                 sampler=ctx.current_sampler
             )
+        except ForbiddenPythonError:
+            logger.error(f'线程:[ {ContextService.get_context().thread_name} ] 脚本:[ {self.name} ] 禁止使用 os 模块')
         except Exception:
             logger.exception('Exception Occurred')

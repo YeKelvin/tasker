@@ -5,13 +5,14 @@
 import time
 
 import orjson
+
 from gevent.event import Event
 from loguru import logger
 from loguru._logger import context as logurucontext
 
 from pymeter.engines import script_service
 from pymeter.engines.standard_engine import StandardEngine
-from pymeter.tools.exceptions import InvalidScriptException
+from pymeter.tools.exceptions import InvalidScriptError
 from pymeter.utils.json_util import to_pretty_json
 from pymeter.utils.log_util import SocketIOHandler
 
@@ -38,7 +39,7 @@ class Runner:
         """
         # 校验脚本不能为空
         if not script:
-            raise InvalidScriptException('脚本不允许为空')
+            raise InvalidScriptError('脚本不允许为空')
 
         # 初始化extra
         if not extra:

@@ -11,7 +11,7 @@ from pymeter.engines.engine import Engine
 from pymeter.engines.interface import TestCollectionListener
 from pymeter.engines.traverser import SearchByClass
 from pymeter.listeners.result_collector import ResultCollector
-from pymeter.tools.exceptions import StopTestException
+from pymeter.tools.exceptions import StopTestError
 from pymeter.workers.context import ContextService
 from pymeter.workers.setup_worker import SetupWorker
 from pymeter.workers.teardown_worker import TeardownWorker
@@ -213,7 +213,7 @@ class StandardEngine(Engine):
             # 存储当前 TestWorker，用于后续管理线程（启动、停止或循环）
             self.workers.append(worker)
             worker.start(worker_count, worker_tree, self)
-        except StopTestException:
+        except StopTestError:
             logger.info('停止运行')
 
     def _wait_workers_stopped(self) -> None:

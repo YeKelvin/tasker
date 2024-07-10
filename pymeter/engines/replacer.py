@@ -7,7 +7,7 @@ from loguru import logger
 from pymeter.elements.property import BasicProperty
 from pymeter.elements.property import FunctionProperty
 from pymeter.functions import Function
-from pymeter.tools.exceptions import InvalidVariableException
+from pymeter.tools.exceptions import InvalidVariableError
 from pymeter.utils.class_finder import ClassFinder
 from pymeter.workers.context import ContextService
 
@@ -236,7 +236,7 @@ class FunctionParser:
                     function.set_parameters(FunctionParser.__parse_params(reader))
                     current = reader.next
                     if current is None or current != '}':
-                        raise InvalidVariableException(f'expected }} after {func_name} function call in {reader.raw}')
+                        raise InvalidVariableError(f'expected }} after {func_name} function call in {reader.raw}')
                     return function
                 else:  # 函数不存在，按普通字符处理
                     buffer.append(current)

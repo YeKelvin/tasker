@@ -4,19 +4,19 @@
 # @Author  : Kelvin.Ye
 
 
-class InvalidScriptException(Exception):
+class InvalidScriptError(Exception):
     ...
 
 
-class InvalidVariableException(Exception):
+class InvalidVariableError(Exception):
     ...
 
 
-class InvalidPropertyException(Exception):
+class InvalidPropertyError(Exception):
     ...
 
 
-class EngineException(Exception):
+class EngineError(Exception):
     ...
 
 
@@ -28,19 +28,19 @@ class NodeParseError(Exception):
     ...
 
 
-class NextIsNullException(Exception):
+class NextIsNone(Exception):
     ...
 
 
-class StopTestWorkerException(Exception):
+class StopTestWorkerError(Exception):
     ...
 
 
-class StopTestException(Exception):
+class StopTestError(Exception):
     ...
 
 
-class StopTestNowException(Exception):
+class StopTestNowError(Exception):
     ...
 
 
@@ -48,11 +48,11 @@ class UnsupportedOperationError(Exception):
     ...
 
 
-class HTTPHeaderDuplicateException(Exception):
+class HTTPHeaderDuplicateError(Exception):
     ...
 
 
-class HTTPCookieDuplicateException(Exception):
+class HTTPCookieDuplicateError(Exception):
     ...
 
 
@@ -60,4 +60,8 @@ class FunctionError(Exception):
     ...
 
 class UserInterruptedError(Exception):
+    ...
+
+
+class ForbiddenPythonError(Exception):
     ...

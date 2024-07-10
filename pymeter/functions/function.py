@@ -2,7 +2,7 @@
 # @File    : function.py
 # @Time    : 2020/1/19 17:05
 # @Author  : Kelvin.Ye
-from pymeter.tools.exceptions import InvalidVariableException
+from pymeter.tools.exceptions import InvalidVariableError
 from pymeter.workers.context import ContextService
 
 
@@ -31,20 +31,20 @@ class Function:
     def check_parameter_count(self, params: list, count: int) -> None:
         num = len(params)
         if num != count:
-            raise InvalidVariableException(
+            raise InvalidVariableError(
                 f'{self.REF_KEY} called with wrong number of parameters. Actual: {num}. Expected: {count}.'
             )
 
     def check_parameter_min(self, params: list, minimum: int) -> None:
         num = len(params)
         if num < minimum:
-            raise InvalidVariableException(
+            raise InvalidVariableError(
                 f'{self.REF_KEY} called with wrong number of parameters. Actual: {num}. Expected at least: {minimum}.'
             )
 
     def check_parameter_max(self, params: list, maximum: int = None) -> None:
         num = len(params)
         if num > maximum:
-            raise InvalidVariableException(
+            raise InvalidVariableError(
                 f'{self.REF_KEY} called with wrong number of parameters. Actual: {num}. Expected at most: {maximum}.'
             )

@@ -3,12 +3,14 @@
 # @Time    : 2020/2/16 21:29
 # @Author  : Kelvin.Ye
 import traceback
+
 from typing import Final
 
 from loguru import logger
 
 from pymeter.samplers.sample_result import SampleResult
 from pymeter.samplers.sampler import Sampler
+from pymeter.tools.exceptions import ForbiddenPythonError
 from pymeter.tools.python_code_snippets import DEFAULT_LOCAL_IMPORT_MODULE
 from pymeter.tools.python_code_snippets import INDENT
 from pymeter.workers.context import ContextService
@@ -48,11 +50,18 @@ class PythonSampler(Sampler):
         result.request_data = self.script
         result.sample_start()
 
-        # noinspection PyBroadException
         try:
-            # 定义脚本中可用的内置变量
-            params = {'self': self}
-            exec(self.raw_function, params, params)
+            # 获取代码
+            code = self.raw_function
+
+            # 禁止使用os模块
+            if 'import os' in code:
+                raise ForbiddenPythonError()
+
+            # 动态生成函数
+            exec(self.raw_function, {'self': self}, {'self': self})
+
+            # 执行函数
             ctx = ContextService.get_context()
             if res := self.dynamic_function(  # noqa
                 log=logger,
@@ -63,6 +72,9 @@ class PythonSampler(Sampler):
                 result=result
             ):
                 result.response_data = res if isinstance(res, str) else str(res)
+        except ForbiddenPythonError:
+            result.success = False
+            result.response_data = '错误: 禁止使用 os 模块'
         except Exception:
             result.success = False
             result.response_data = traceback.format_exc()

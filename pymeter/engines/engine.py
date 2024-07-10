@@ -11,7 +11,7 @@ from pymeter.engines.context import EngineContext
 from pymeter.engines.hashtree import HashTree
 from pymeter.engines.traverser import SearchByClass
 from pymeter.engines.variables import Variables
-from pymeter.tools.exceptions import EngineException
+from pymeter.tools.exceptions import EngineError
 
 
 class Engine(Greenlet):
@@ -36,7 +36,7 @@ class Engine(Greenlet):
             self.running = True
             self.start()  # _run()
             self.join()  # 等待主线程结束
-        except EngineException as e:
+        except EngineError as e:
             logger.error(e)
         except Exception:
             logger.exception('Exception Occurred')
@@ -52,7 +52,7 @@ class Engine(Greenlet):
         collections = searcher.get_search_result()
 
         if len(collections) == 0:
-            raise EngineException('集合不允许为空')
+            raise EngineError('集合不允许为空')
 
         self.active = True
         self.collection_tree = hashtree

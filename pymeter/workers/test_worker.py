@@ -29,9 +29,9 @@ from pymeter.engines.traverser import TreeCloner
 from pymeter.engines.variables import Variables
 from pymeter.samplers.sample_result import SampleResult
 from pymeter.samplers.sampler import Sampler
-from pymeter.tools.exceptions import StopTestException
-from pymeter.tools.exceptions import StopTestNowException
-from pymeter.tools.exceptions import StopTestWorkerException
+from pymeter.tools.exceptions import StopTestError
+from pymeter.tools.exceptions import StopTestNowError
+from pymeter.tools.exceptions import StopTestWorkerError
 from pymeter.tools.exceptions import UserInterruptedError
 from pymeter.workers.context import ContextService
 from pymeter.workers.context import ThreadContext
@@ -357,13 +357,13 @@ class Coroutine(Greenlet):
                 if self.worker_main_controller.done:
                     self.running = False
                     logger.info(f'线程:[ {self.thread_name} ] 已停止，执行结束')
-        except StopTestWorkerException:
+        except StopTestWorkerError:
             logger.debug(f'线程:[ {self.thread_name} ] 捕获异常:[ StopTestWorkerException ] 停止执行用例')
             self.stop_worker()
-        except StopTestException:
+        except StopTestError:
             logger.debug(f'线程:[ {self.thread_name} ] 捕获异常:[ StopTestException ] 停止执行测试')
             self.stop_test()
-        except StopTestNowException:
+        except StopTestNowError:
             logger.debug(f'线程:[ {self.thread_name} ] 捕获:[ StopTestNowException ] 立即停止执行')
             self.stop_now()
         except UserInterruptedError:

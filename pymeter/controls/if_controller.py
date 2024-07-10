@@ -7,7 +7,7 @@ from typing import Final
 from loguru import logger
 
 from pymeter.controls.generic_controller import GenericController
-from pymeter.tools.exceptions import NextIsNullException
+from pymeter.tools.exceptions import NextIsNone
 from pymeter.workers.context import ContextService
 
 
@@ -47,7 +47,7 @@ class IfController(GenericController):
         try:
             self.initialize_sub_controllers()
             return self.next_is_null()
-        except NextIsNullException:
+        except NextIsNone:
             return None
 
     def trigger_end_of_loop(self):

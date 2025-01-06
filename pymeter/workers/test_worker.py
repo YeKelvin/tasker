@@ -2,11 +2,12 @@
 # @File    : test_worker.py
 # @Time    : 2020/2/13 12:58
 # @Author  : Kelvin.Ye
+import gc
+
 from typing import Final
 
 import gevent
 
-from gevent import Greenlet
 from loguru import logger
 
 from pymeter.assertions.assertion import Assertion
@@ -258,7 +259,7 @@ class TestWorker(Worker, TestCompilerHelper):
         return cloner.get_cloned_tree()
 
 
-class Coroutine(Greenlet):
+class Coroutine(gevent.Greenlet):
 
     LAST_SAMPLE_OK: Final = 'Coroutine__last_sample_ok'
 
@@ -821,10 +822,11 @@ class Coroutine(Greenlet):
             sample_result.assertions.append(assertion_result)
 
     class IterationListener(LoopIterationListener):
-        """Coroutine 内部类，用于在 TestWorker 迭代开始时触发所有实现类的开始动作"""
+        """线程内部类，用于在 TestWorker 迭代开始时触发所有实现类的开始动作"""
 
         def __init__(self, parent: 'Coroutine'):
             self.parent = parent
 
         def iteration_start(self, source, iter) -> None:
+            gc.collect()
             self.parent._notify_test_iteration_listeners()

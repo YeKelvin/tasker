@@ -2,6 +2,7 @@
 # @File    : standard_engine
 # @Time    : 2020/1/24 23:31
 # @Author  : Kelvin.Ye
+import gc
 import logging
 
 from loguru import logger
@@ -61,10 +62,13 @@ class StandardEngine(Engine):
 
         # 运行SetUpWorker
         worker_total += self._process_setup_worker(setup_worker_searcher, collection_component_list)
+        gc.collect()
         # 运行TestWorker
         worker_total += self._process_test_worker(test_worker_searcher, collection_component_list)
+        gc.collect()
         # 运行TeardownWorker
         worker_total += self._process_teardown_worker(teardown_worker_searcher, collection_component_list)
+        gc.collect()
 
         if worker_total == 0:
             logger.warning('集合不存在 #有效用例#')
@@ -103,6 +107,7 @@ class StandardEngine(Engine):
                 if self.sequential:
                     logger.info(f'用例:[ {worker_name} ] 等待当前 #前置用例# 执行完成')
                     setup_worker.wait_threads_stopped()
+                    gc.collect()
             except StopIteration:
                 logger.info('所有 #前置用例# 已启动')
                 break
@@ -135,6 +140,7 @@ class StandardEngine(Engine):
                 if self.sequential:
                     logger.info(f'用例:[ {worker_name} ] 等待当前 #用例# 执行完成')
                     test_worker.wait_threads_stopped()
+                    gc.collect()
             except StopIteration:
                 logger.info('所有 #用例# 已启动')
                 break
@@ -171,6 +177,7 @@ class StandardEngine(Engine):
                 if self.sequential:
                     logger.info(f'用例:[ {worker_name} ] 等待当前 #后置用例# 完成')
                     teardown_worker.wait_threads_stopped()
+                    gc.collect()
             except StopIteration:
                 logger.info('所有 #后置用例# 已启动')
                 break

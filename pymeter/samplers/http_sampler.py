@@ -8,7 +8,9 @@ from uuid import uuid4
 
 import httpx
 
+from httpx import ConnectError
 from httpx import Response
+from httpx import UnsupportedProtocol
 from loguru import logger
 
 from pymeter.configs.arguments import Arguments
@@ -202,6 +204,18 @@ class HTTPSampler(Sampler):
             result.response_message = HTTP_STATUS_CODE.get(res.status_code)
             result.response_headers = dict(res.headers)
             result.response_cookies = dict(res.cookies)
+        except UnsupportedProtocol as err:
+            result.success = False
+            result.request_data = f'{self.method} {self.url}'
+            result.response_data = str(err)
+            result.response_code = 500
+            result.response_message = 'UnsupportedProtocol'
+        except ConnectError as err:
+            result.success = False
+            result.request_data = f'{self.method} {self.url}'
+            result.response_data = str(err)
+            result.response_code = 500
+            result.response_message = 'ConnectError'
         except Exception as err:
             logger.exception('Exception Occurred')
             result.error = True

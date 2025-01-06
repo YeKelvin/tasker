@@ -1,19 +1,27 @@
+# os
 .DS_Store
-.idea/
-.cache/
-.pytest_cache/
-.html/
-.report/
+
+# env
+.venv/
+
+# cache
+.ruff_cache/
 __pycache__/
 
+# ide
+.idea/
+
+# pytest
+.pytest_cache/
+**/assets/
+**/report.html
+
+# local
 *.lock
 *.log
 
 # build
 *.egg-info/
 
-# pytest
-**/assets/
-**/report.html
-
+# perf
 profile.out

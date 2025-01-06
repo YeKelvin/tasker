@@ -1,70 +1,59 @@
-[build-system]
-requires = ["poetry_core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
-
-[tool.poetry]
+[project]
 name = "pymeter"
 readme = "README.md"
 version = "0.1.0"
 description = ""
-requires-python = ">=3.11"
-authors = [
-    "Kelvin.Ye <testmankelvin@163.com>"
+requires-python = ">= 3.11"
+authors = [{ name = "Kelvin.Ye", email = "testmankelvin@163.com" }]
+dependencies = [
+    "orjson==3.10.11",
+    "jsonpath==0.82.2",
+    "xmltodict==0.14.2",
+    "sqlalchemy==2.0.36",
+    "pyodbc==5.2.0",
+    "cx-oracle==8.3.0",
+    "psycopg2-binary==2.9.10",
+    "mysql-connector-python==9.1.0",
+    "sshtunnel==0.4.0",
+    "pycryptodome==3.21.0",
+    "python-engineio==4.10.1",
+    "python-socketio==5.11.4",
+    "arrow==1.3.0",
+    "faker==30.8.2",
+    "httpx==0.27.2",
+    "json5==0.9.25",
+    "bidict==0.23.1",
+    "loguru==0.7.2",
+    "gevent==24.10.3",
+    "uvloop==0.21.0",
+    "ulid-py==1.1.0",
+    "pytypes==1.0b10",
+    "tabulate==0.9.0",
+    "requests==2.32.3",
+    "json_repair==0.30.1",
 ]
-packages = [
-    { include = "pymeter" },
-    { include = "pymeter/**/*.py" }
+
+[tool.uv]
+dev-dependencies = [
+    "pip",
+    "ruff",
+    "pre-commit",
+    "pytest",
+    "pytest-html",
+    "pytest-asyncio",
+    "flask",
 ]
-classifiers = [
-    "Programming Language :: Python"
-]
 
-[[tool.poetry.source]]
-name = "aliyun"
-url = "https://mirrors.aliyun.com/pypi/simple/"
-priority = "primary"
+[tool.hatch.metadata]
+allow-direct-references = true
 
-[[tool.poetry.source]]
-name = "tsinghua"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple/"
-priority = "supplemental"
+[tool.hatch.build.targets.sdist]
+exclude = []
 
-[tool.poetry.dependencies]
-python = "^3.11"
-orjson = "3.10.6"
-jsonpath = "0.82.2"
-xmltodict = "0.13.0"
-sqlalchemy = "2.0.31"
-pyodbc = "5.1.0"
-cx-oracle = "8.3.0"
-psycopg2-binary = "2.9.9"
-mysql-connector-python = "9.0.0"
-sshtunnel = "0.4.0"
-pycryptodome = "3.20.0"
-python-engineio = "4.9.1"
-python-socketio = "5.11.3"
-ulid-py = "1.1.0"
-arrow = "1.3.0"
-faker = "26.0.0"
-httpx = "0.27.0"
-json5 = "0.9.25"
-bidict = "0.23.1"
-loguru = "0.7.2"
-gevent = "24.2.1"
-uvloop = "0.19.0"
-pytypes = "1.0b10"
-tabulate = "0.9.0"
-requests = "2.32.3"
-
-[tool.poetry.group.dev.dependencies]
-flask = "*"
-pytest = "*"
-pytest-html = "*"
-pytest-asyncio = "*"
-ruff = "*"
+[tool.hatch.build.targets.wheel]
+packages = ["pymeter"]
 
 [tool.ruff]
-target-version = "py311"
 line-length = 120
 src = ["pymeter"]
 select = [
@@ -87,13 +76,12 @@ ignore = [
 ]
 exclude = [
     "__pycache__",
-    ".cache",
+    ".venv",
     ".vscode",
-    "sql",
     "docs",
     "scripts",
-    "ruff_cache"
 ]
+extend-include = ["*.ipynb"]
 
 [tool.ruff.pydocstyle]
 convention = "google"
@@ -103,7 +91,13 @@ force-single-line = true
 lines-after-imports = 2
 lines-between-types = 1
 
+[tool.ruff.format]
+line-ending = "lf"
+quote-style = "single"
+skip-magic-trailing-comma = true
+
 [tool.pytest.ini_options]
+asyncio_mode = "auto"
 minversion = "6.0"
 testpaths = "tests"
 addopts = [
@@ -117,5 +111,13 @@ addopts = [
 log_cli = true
 log_level = "DEBUG"
 log_format = "[%(asctime)s][%(levelname)s][%(name)s.%(funcName)s:%(lineno)d] %(message)s"
-filterwarnings = ["error", "ignore::DeprecationWarning"]
+filterwarnings = ["error"]
 required_plugins = ["pytest-html"]
+
+[[tool.uv.index]]
+name = "aliyun"
+url = "https://mirrors.aliyun.com/pypi/simple/"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

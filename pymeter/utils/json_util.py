@@ -5,6 +5,7 @@
 import random
 
 import orjson
+
 from jsonpath import jsonpath
 
 
@@ -12,7 +13,7 @@ class JsonpathExtractException(Exception):
     ...
 
 
-def to_json(obj: dict or list) -> str:
+def to_json(obj: dict | list) -> str:
     """序列化"""
     return orjson.dumps(obj).decode('utf8')
 
